@@ -34,7 +34,7 @@ public:
 	{
 		return _ptr;
 	}
-	const_iterator begin() const
+	const_iterator cbegin() const
 	{
 		return _ptr;
 	}
@@ -42,7 +42,7 @@ public:
 	{
 		return _ptr+_size;
 	}
-	const_iterator end() const
+	const_iterator cend() const
 	{
 		return _ptr+_size;
 	}
