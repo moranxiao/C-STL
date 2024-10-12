@@ -1,7 +1,7 @@
 #pragma warning(disable:4996)
 #pragma once
 #include <utility>
-
+#include <cassert>
 
 namespace moran {
 	template <typename T>
@@ -20,7 +20,7 @@ namespace moran {
 		{
 			return _finish;
 		}
-		const_iterator cbegin() const 
+		const_iterator cbegin() const
 		{
 			return _start;
 		}
@@ -36,28 +36,34 @@ namespace moran {
 		// 
 		reverse_iterator rbegin()
 		{
-			return _finish-1;
+			return _finish - 1;
 		}
 		reverse_iterator rend()
 		{
-			return _start-1;
+			return _start - 1;
 		}
 		const_reverse_iterator begin() const
 		{
-			return _finish-1;
+			return _finish - 1;
 		}
 		const_reverse_iterator end() const
 		{
-			return _start-1;
+			return _start - 1;
 		}
 	public:
-		
+
 		vector() = default;
 		~vector()
 		{
 			delete[] _start;
 		}
 		vector(size_t n, const T& value = T())
+		{
+			resize(n, value);
+		}
+		//为什么要重载这个int类型的呢？因为当vector<int>(10,3)构造时，10和3会被认为是int类型，
+		// 觉得size_t不匹配，会走下面迭代器版本的构造
+		vector(int n, const T& value = T())
 		{
 			resize(n, value);
 		}
@@ -73,13 +79,25 @@ namespace moran {
 		//老板思维
 		vector(const vector& v)
 		{
-			//因为v是const类型，自然要调用const迭代器咯
+			//因为形参v是const类型，自然要调用const迭代器咯
 			vector tmp(v.cbegin(), v.cend());
 			std::swap(_start, tmp._start);
 			std::swap(_finish, tmp._finish);
 			std::swap(_end_of_storage, tmp._end_of_storage);
 		}
-		
+		//参数直接选择值传递，这样会调用拷贝构造函数，直接拷贝出来一个临时对象，swap资源转移过来即可
+		vector& operator=(vector v)
+		{
+			swap(tmp);
+			return *this;
+		}
+		void swap(vector& v)
+		{
+			std::swap(v._start, _start);
+			std::swap(v._finish, _finish);
+			std::swap(v._end_of_storage, _end_of_storage);
+		}
+
 		//增
 		void push_back(const T& value)
 		{
@@ -90,6 +108,26 @@ namespace moran {
 			*_finish = value;
 			_finish++;
 		}
+
+		iterator insert(iterator pos, const T& value)
+		{
+			assert(pos >= _start && pos <= _finish);
+			size_t index = pos - _start;
+			if (capacity() == size())
+			{
+				reserve(capacity() * 2);
+			}
+			pos = index + _start;
+			iterator it = _finish;
+			while (it > pos)
+			{
+				*it = *(it-1);
+				it--;
+			}
+			*it = value;
+			_finish++;
+			return pos;
+		}
 		//删
 		void pop_back()
 		{
@@ -98,10 +136,44 @@ namespace moran {
 				_finish--;
 			}
 		}
-		//改
-		
-		//查
 
+		iterator erase(iterator pos)
+		{
+			assert(pos >= _start && pos < _finish);
+			iterator it = pos;
+			while (it+1  < _finish)
+			{
+				*it = *(it + 1);
+				it++;
+			}
+			_finish --;
+			return pos;
+		}
+		iterator erase(iterator first, iterator last)
+		{
+			assert(first < last && first >= _start && last <= _finish);
+			size_t len = last - first + 1;
+			iterator it = first;
+			while (it + len < _finish)
+			{
+				*it = *(it + len);
+				it++;
+			}
+			_finish -= len;
+			return first;
+		}
+		//改
+		T& operator[](size_t index)
+		{
+			assert(size() - 1 >= index);
+			return _start[index];
+		}
+		//查
+		const T& operator[](size_t index) const
+		{
+			assert(size() - 1 >= index);
+			return _start[index];
+		}
 
 
 		void reserve(size_t n)
@@ -127,7 +199,7 @@ namespace moran {
 				}
 			}
 		}
-		void resize(size_t n,const T& value = T())
+		void resize(size_t n, const T& value = T())
 		{
 			if (n > capacity())
 			{
