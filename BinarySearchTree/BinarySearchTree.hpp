@@ -264,3 +264,29 @@ namespace moran {
 		Node* _root = nullptr;
 	};
 }
+
+
+namespace KeyValue {
+	template <class K,class V>
+	struct BSTNode {
+		BSTNode(const K& key = K(), const V& value = V(), BSTNode* left = nullptr,BSTNode* right = nullptr)
+			:_key(key),
+			_value(value),
+			_left(left),
+			_right(right)
+		{}
+		BSTNode* _left;
+		BSTNode* _right;
+		K _key;
+		V _value;
+	};
+
+	template <class K,class V>
+	class BSTree {
+		typedef BSTNode<K,V> Node;
+	public:
+
+	private:
+		Node* _root = nullptr;
+	};
+}
