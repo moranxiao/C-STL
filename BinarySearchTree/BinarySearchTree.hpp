@@ -39,9 +39,9 @@ namespace moran {
 
 		bool Insert(const K& value)
 		{
-			Node* new_node = new Node(value);
 			if (_root == nullptr)
 			{
+				Node* new_node = new Node(value);
 				_root = new_node;
 				return true;
 			}
@@ -52,6 +52,7 @@ namespace moran {
 				{
 					if (nullptr == cur->_right)
 					{
+						Node* new_node = new Node(value);
 						cur->_right = new_node;
 						return true;
 					}
@@ -61,6 +62,7 @@ namespace moran {
 				{
 					if (nullptr == cur->_left)
 					{
+						Node* new_node = new Node(value);
 						cur->_left = new_node;
 						return true;
 					}
