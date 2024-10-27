@@ -140,6 +140,7 @@ namespace moran {
 		bool _IsLegal(Node* root)
 		{
 			if (root == nullptr) return true;
+			if (root->_bf >= 2 || root->_bf <= -2) return false;
 			if (!_IsLegal(root->_left) || !_IsLegal(root->_right)) return false;
 			return root->_bf == (Height(root->_right) - Height(root->_left));
 		}
