@@ -16,7 +16,7 @@ namespace moran {
 		RBTreeNode<T>* _right;
 		T _data;
 		Color _col;
-		RBTreeNode(const T data = T(), Color col = RED, RBTreeNode<T>* left = nullptr,
+		RBTreeNode(const T& data = T(), Color col = RED, RBTreeNode<T>* left = nullptr,
 			RBTreeNode<T>* right = nullptr, RBTreeNode<T>* parent = nullptr)
 			:_data(data),
 			_col(col),
@@ -25,21 +25,127 @@ namespace moran {
 			_parent(parent)
 		{}
 	};
-	
+	template <class T,class Ptr,class Ref>
+	class __RBTreeIterator
+	{
+		typedef RBTreeNode<T> Node;
+		typedef __RBTreeIterator<T, Ptr, Ref> Self;
+	public:
+		__RBTreeIterator(Node* ptr)
+			:_ptr(ptr)
+		{}
+		Self& operator++()
+		{
+			if (_ptr->_right == nullptr)
+			{
+				Node* parent = _ptr->_parent;
+				while (parent && parent->_right == _ptr)
+				{
+					_ptr = parent;
+					parent = _ptr->_parent;
+				}
+				_ptr = parent;
+			}
+			else
+			{
+				_ptr = _ptr->_right;
+				while (_ptr->_left)
+				{
+					_ptr = _ptr->_left;
+				}
+			}
+			return *this;
+		}
+		Self& operator--()
+		{
+			if (_ptr->_left == nullptr)
+			{
+				Node* parent = _ptr->_parent;
+				while (parent && parent->_left == _ptr)
+				{
+					_ptr = parent;
+					parent = _ptr->_parent;
+				}
+				_ptr = parent;
+			}
+			else
+			{
+				_ptr = _ptr->_left;
+				while (_ptr->_right)
+				{
+					_ptr = _ptr->_right;
+				}
+			}
+			return *this;
+		}
+		Ref operator*() const
+		{
+			return _ptr->_data;
+		}
+		Ptr operator->() const 
+		{
+			return &(_ptr->_data);
+		}
+		bool operator==(const Self& other) const 
+		{
+			return _ptr == other._ptr;
+		}
+		bool operator!=(const Self& other) const
+		{
+			return _ptr != other._ptr;
+		}
+	private:
+		Node* _ptr;
+	};
+
 	template<class K,class T,class KOfT,class Compare>
 	class RBTree {
 		typedef RBTreeNode<T> Node;
 	public:
+		typedef __RBTreeIterator<T, T*, T&> iterator;
+		typedef __RBTreeIterator<T, const T*, const T&> const_iterator;
+		
+		iterator begin()
+		{
+			if(_root == nullptr)
+				return iterator(_root);
+			Node* cur = _root;
+			while (cur->_left)
+			{
+				cur = cur->_left;
+			}
+			return iterator(cur);
+		}
+		iterator end()
+		{
+			return iterator(nullptr);
+		}
+		const_iterator cbegin() const
+		{
+			if (_root == nullptr)
+				return const_iterator(_root);
+			Node* cur = _root;
+			while (cur->_left)
+			{
+				cur = cur->_left;
+			}
+			return const_iterator(cur);
+		}
+		const_iterator cend() const
+		{
+			return const_iterator(nullptr);
+		}
+	public:
 		RBTree() = default;
 		
-		bool Insert(const T& data)
+		std::pair<iterator,bool> Insert(const T& data)
 		{
 			KOfT kot;
 			Compare cmp;
 			if (_root == nullptr)
 			{
 				_root = new Node(data,BLACK);
-				return true;
+				return std::make_pair(iterator(_root), true);
 			}
 			Node* cur = _root;
 			while (cur)
@@ -68,8 +174,11 @@ namespace moran {
 					}
 					else cur = cur->_left;
 				}
-				else return false;
+				else
+					return std::make_pair(iterator(cur), false);
+
 			}
+			Node* new_node = cur;
 			Node* parent = cur->_parent;
 			while (parent && parent->_col == RED)
 			{
@@ -115,7 +224,7 @@ namespace moran {
 					else break;
 				}
 			}
-			return true;
+			return std::make_pair(new_node,true);
 		}
 		bool IsLegal()
 		{
