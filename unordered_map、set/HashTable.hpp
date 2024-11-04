@@ -309,21 +309,11 @@ namespace Bucket {
 			}
 			Hash hash;
 			size_t pos = hash(kot(data)) % _table.size();
-			if (_table[pos] == nullptr)
-			{
-				_table[pos] = new Node(data);
-				_size++;
-				
-				return std::make_pair(iterator(_table[pos], this), true);
-			}
-			Node* cur = _table[pos];
-			while (cur->_next)
-			{
-				cur = cur->_next;
-			}
-			cur->_next = new Node(data);
+			Node* new_node = new Node(data);
+			new_node->_next = _table[pos];
+			_table[pos] = new_node;
 			_size++;
-			return std::make_pair(iterator(cur->_next, this), true);
+			return std::make_pair(iterator(new_node, this), true);
 		}
 		iterator Find(const K& key)
 		{
