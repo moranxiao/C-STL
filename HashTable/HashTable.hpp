@@ -206,18 +206,9 @@ namespace Bucket {
 				_table.swap(new_hash._table);
 			}
 			size_t pos = kv.first % _table.size();
-			if (_table[pos] == nullptr)
-			{
-				_table[pos] = new Node(kv);
-				_size++;
-				return true;
-			}
-			Node* cur = _table[pos];
-			while (cur->_next)
-			{
-				cur = cur->_next;
-			}
-			cur->_next = new Node(kv);
+			Node* new_node = new Node(kv);
+			new_node->_next = _table[pos];
+			_table[pos] = new_node;
 			_size++;
 			return true;
 		}
