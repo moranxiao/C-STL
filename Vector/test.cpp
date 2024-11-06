@@ -1,12 +1,18 @@
-#include "vector.hpp"
 #include <iostream>
 #include <vector>
-
+#include "vector.hpp"
 using std::cout;
 using std::cin;
 using std::endl;
 
 using namespace moran;
+
+
+vector<int> getv()
+{
+	vector<int> v1(5, 10);
+	return v1;
+}
 
 int main()
 {
@@ -56,7 +62,7 @@ int main()
 	//	cout << e << ' ';
 	//}
 	//	
-	int a[] = { 1,2,3,4,5,6,7,8,9,10 ,11};
+	//int a[] = { 1,2,3,4,5,6,7,8,9,10 ,11};
 	//vector<int> v(a, a + sizeof(a) / sizeof(int));
 	//auto it = v.begin();
 	//while(it < v.end())
@@ -65,8 +71,11 @@ int main()
 	//		it = v.erase(it);
 	//	else it++;
 	//}
-	vector<int> v(10, 5);
-	for (auto e : v)
-		cout << e << ' ';
+	//vector<int> v(10, 5);
+	//for (auto e : v)
+	//	cout << e << ' ';
+	vector<int> v1(10, 5);
+	vector<int> v2(std::move(v1));
+	v1 = std::move(v2);
 	return 0;
 }

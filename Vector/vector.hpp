@@ -84,13 +84,20 @@ namespace moran {
 			std::swap(_start, tmp._start);
 			std::swap(_finish, tmp._finish);
 			std::swap(_end_of_storage, tmp._end_of_storage);
+			std::cout << "深拷贝" << std::endl;
+		}
+		vector(vector&& v)
+		{
+			swap(v);
+			std::cout << "移动构造" << std::endl;
 		}
 		//参数直接选择值传递，这样会调用拷贝构造函数，直接拷贝出来一个临时对象，swap资源转移过来即可
 		vector& operator=(vector v)
 		{
-			swap(tmp);
+			swap(v);
 			return *this;
 		}
+		
 		void swap(vector& v)
 		{
 			std::swap(v._start, _start);
@@ -125,6 +132,25 @@ namespace moran {
 				it--;
 			}
 			*it = value;
+			_finish++;
+			return pos;
+		}
+		iterator insert(iterator pos,T&& value)
+		{
+			assert(pos >= _start && pos <= _finish);
+			size_t index = pos - _start;
+			if (capacity() == size())
+			{
+				reserve(capacity() * 2);
+			}
+			pos = index + _start;
+			iterator it = _finish;
+			while (it > pos)
+			{
+				*it = *(it - 1);
+				it--;
+			}
+			*it = std::forward(value);
 			_finish++;
 			return pos;
 		}
